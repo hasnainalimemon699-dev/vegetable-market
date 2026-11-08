@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fresh Vegetable Market</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f8f1;
+  color: #222;
+}
+header {
+  background: #16833b;
+  color: white;
+  text-align: center;
+  padding: 25px 10px;
+}
+header h1 {
+  margin: 0;
+  font-size: 27px;
+}
+header p {
+  margin-bottom: 0;
+}
+nav {
+  background: #075d2b;
+  padding: 13px;
+  text-align: center;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 10px;
+  font-weight: bold;
+}
+.hero {
+  text-align: center;
+  padding: 25px 10px;
+  background: #e1f4df;
+}
+.hero h2 {
+  color: #137332;
+}
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 15px;
+}
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 15px;
+}
+.product {
+  background: white;
+  padding: 15px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #ccc;
+}
+.product .emoji {
+  font-size: 45px;
+}
+.product h3 {
+  margin: 8px 0;
+}
+.price {
+  color: #16833b;
+  font-weight: bold;
+}
+button {
+  background: #16833b;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+button:hover {
+  background: #075d2b;
+}
+.cart, .checkout {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  margin-top: 25px;
+  box-shadow: 0 2px 8px #ddd;
+}
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+}
+footer {
+  text-align: center;
+  padding: 20px;
+  background: #075d2b;
+  color: white;
+  margin-top: 30px;
+}
+.remove {
+  background: #d62828;
+  padding: 6px 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🥬 Fresh Vegetable Market</h1>
+  <p>Fresh Sabziyan | Best Prices | Online Delivery</p>
+</header>
+
+<nav>
+  <a href="#home">Home</a>
+  <a href="#products">Vegetables</a>
+  <a href="#cart">My Cart</a>
+</nav>
+
+<section class="hero" id="home">
+  <h2>Welcome To Our Vegetable Market</h2>
+  <p>Order Fresh Vegetables From Your Home!</p>
+</section>
+
+<div class="container">
+
+<h2 id="products">🛒 Available Vegetables</h2>
+
+<div class="products" id="productList"></div>
+
+<div class="cart" id="cart">
+  <h2>🛍️ My Shopping Cart</h2>
+  <div id="cartItems">Your cart is empty.</div>
+  <h3>Total: Rs. <span id="total">0</span></h3>
+</div>
+
+<div class="checkout">
+  <h2>📦 Customer Details</h2>
+
+  <input id="customer" type="text"
+  placeholder="Enter Your Name" required>
+
+  <input id="phone" type="tel"
+  placeholder="Enter Mobile Number" required>
+
+  <textarea id="address"
+  placeholder="Enter Your Complete Address" required></textarea>
+
+  <button onclick="placeOrder()">
+    Order On WhatsApp
+  </button>
+</div>
+
+</div>
+
+<footer>
+  <p>© 2026 Fresh Vegetable Market</p>
+  <p>Thank You For Shopping With Us ❤️</p>
+</footer>
+
+<script>
+
+// Vegetable prices (Demo prices in Pakistani Rupees)
+const vegetables = [
+  {name:"Potato (Aloo)", emoji:"🥔", price:100},
+  {name:"Tomato (Tamatar)", emoji:"🍅", price:120},
+  {name:"Onion (Pyaz)", emoji:"🧅", price:90},
+  {name:"Carrot (Gajar)", emoji:"🥕", price:100},
+  {name:"Cabbage (Band Gobi)", emoji:"🥬", price:80},
+  {name:"Cauliflower (Phool Gobi)", emoji:"🥦", price:120},
+  {name:"Cucumber (Kheera)", emoji:"🥒", price:100},
+  {name:"Chilli (Mirch)", emoji:"🌶️", price:150},
+  {name:"Lemon (Nimbu)", emoji:"🍋", price:180},
+  {name:"Garlic (Lehsan)", emoji:"🧄", price:250}
+];
+
+let cart = [];
+
+function showProducts() {
+  const list = document.getElementById("productList");
+
+  list.innerHTML = vegetables.map((item, index) => `
+    <div class="product">
+      <div class="emoji">${item.emoji}</div>
+      <h3>${item.name}</h3>
+      <p class="price">Rs. ${item.price} / KG</p>
+      <button onclick="addToCart(${index})">
+        Add To Cart
+      </button>
+    </div>
+  `).join("");
+}
+
+function addToCart(index) {
+  const item = vegetables[index];
+  const existing = cart.find(p => p.name === item.name);
+
+  if(existing) {
+    existing.qty++;
+  } else {
+    cart.push({
+      name: item.name,
+      price: item.price,
+      qty: 1
+    });
+  }
+
+  showCart();
+}
+
+function changeQty(index, amount) {
+  cart[index].qty += amount;
+
+  if(cart[index].qty <= 0) {
+    cart.splice(index, 1);
+  }
+
+  showCart();
+}
+
+function removeItem(index) {
+  cart.splice(index, 1);
+  showCart();
+}
+
+function showCart() {
+  const items = document.getElementById("cartItems");
+  let total = 0;
+
+  if(cart.length === 0) {
+    items.innerHTML = "Your cart is empty.";
+  } else {
+    items.innerHTML = cart.map((item, index) => {
+      total += item.price * item.qty;
+
+      return `
+        <div style="border-bottom:1px solid #ddd;padding:10px 0">
+          <b>${item.name}</b><br>
+          Rs. ${item.price} × ${item.qty} KG
+          <br>
+          Subtotal: Rs. ${item.price * item.qty}
+          <br>
+          <button onclick="changeQty(${index},1)">+</button>
+          <button onclick="changeQty(${index},-1)">-</button>
+          <button class="remove"
+          onclick="removeItem(${index})">Remove</button>
+        </div>
+      `;
+    }).join("");
+  }
+
+  document.getElementById("total").innerText = total;
+}
+
+function placeOrder() {
+  const name = document.getElementById("customer").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const address = document.getElementById("address").value.trim();
+
+  if(!name || !phone || !address) {
+    alert("Please fill all customer details!");
+    return;
+  }
+
+  if(cart.length === 0) {
+    alert("Please add vegetables to your cart!");
+    return;
+  }
+
+  let message = "NEW VEGETABLE ORDER\n\n";
+  message += "Customer: " + name + "\n";
+  message += "Phone: " + phone + "\n";
+  message += "Address: " + address + "\n\n";
+
+  let total = 0;
+
+  cart.forEach(item => {
+    message += item.name + " - " + item.qty +
+    " KG = Rs. " + (item.price * item.qty) + "\n";
+
+    total += item.price * item.qty;
+  });
+
+  message += "\nTOTAL BILL: Rs. " + total;
+
+  // Replace with your WhatsApp number.
+  // Format: country code + number, without + sign.
+  const whatsappNumber = "923361120069";
+
+  const url = "https://wa.me/" + whatsappNumber +
+  "?text=" + encodeURIComponent(message);
+
+  window.open(url, "_blank");
+}
+
+showProducts();
+showCart();
+
+</script>
+
+</body>
+</html>
